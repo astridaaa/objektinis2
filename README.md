@@ -1,6 +1,6 @@
 # OOP
 
-Programa skirta failų, turinčių skirtingą studentų skaičių, testavimui su STL konteineriais: vektoriumi, dvipuse eile bei sąrašu.
+Programa skirta failų, turinčių skirtingą studentų skaičių, testavimui su STL konteineriais: vektoriumi, dvipuse eile, sąrašu, bei skirtingais duomenų tipais: _class_ ir _struct_. Programa testuojama dviem būdais: paprastu algoritmu realizuotu v1.2 versijoje bei naudojant catch2 framework'ą, su kuriuo testavimas realizuotas v2.0 versijoje.
 
 # Kompiuterio specifikacijos
 - AMD Ryzen 5 5500U CPU
@@ -9,12 +9,13 @@ Programa skirta failų, turinčių skirtingą studentų skaičių, testavimui su
 
  # Naudojimosi instrukcija:
 - <a href="https://gnuwin32.sourceforge.net/packages/make.htm">Susiinstaliuoti make; </a>
-- Parsisiųsti v1.0 versiją;
+- Parsisiųsti v2.0 versiją;
 - Terminale atsidarius versijos direktoriją paleisti:
     - `make run_main` - norint paleisti antrą tyrimą _(v0.4)_
     - `make run1` - norint paleisti 1 strategiją 
     - `make run2` - norint paleisti 2 strategiją
-    - `make run3` - norint paleisti 3 strategiją
+    - `make run3` - norint paleisti 3 strategiją | atlikti testavimą su algoritmais _(v1.2)_
+    - `make runtest` - norint atlikti catch2 framework'o testavimą _(v2.0)_
 
 # Programos aprašas:
 Pagrindinės funkcijos:
@@ -23,6 +24,40 @@ Pagrindinės funkcijos:
 -    `studentuIsskirstymas2()` - studentų išskirstymas nuo galo naudojant iteratorių
 -    `studentuSkirstymas3()` - studentų išskirstymas "nesimokančius" perkeliant į kitą konteinerį
 -    `studentuRusiavimas() / studentuRusiavimas2() / studentuRusiavimas3()` - studentai rikiuojami pagal pasirinktus kriterijus: vardą, pavardę arba galutinį balą, skaičiuojamą pagal vidurkį
+-    `konstruktoriuTest()` - _rule of five_ ir išvesties/ išvesties operatorių testavimas naudojant paprastą algoritmą
+
+## Pagrindiniai klasių setter'iai ir getter'iai:
+
+Abstrakti bazinė`zmogus` klasė
+```c++
+virtual void setVardas(const string& var) = 0;
+virtual void setPavarde(const string& pav) = 0;
+
+string getVardas()const{return vardas;}
+string getPavarde()const{return pavarde;}
+
+```
+
+Išvestinė `Stud` klasė 
+```c++
+void setVardas(const string& var)override{vardas=var;}
+void setPavarde(const string& pav)override{pavarde=pav;}
+void setEgzaminas(const int& egz){egzaminas=egz;}
+void setBalasGalutinisVid(const double& Balas){BalasGalutinisVid=Balas; balasSuskaiciuotas = true;}
+void setND(int paz){nd.push_back(paz);}
+
+int getEgzaminas() const {return egzaminas;}
+int getPaz(int i) const {return nd[i];} 
+const vector<int>& getND() const {return nd;}
+double galutinisBalas() const {return BalasGalutinisVid;}
+int pazKiekis() const {return nd.size();}
+const int& grazintiPaskutini() const {return nd.back();}
+```
+## v2.0 versija | testavimas, dokumentacija
+Programa testuojama naudojant catch2 _framework'ą_ `unitTesting.cpp` faile. Testuojama rule of five: copy konstruktorius, copy-assignment operatorius, move konstruktorius, move-assignment operatorius ir destruktorius, papildomai testuojama getter'iai bei _default_ konstruktorius. Testai grąžina teigiamą rezultatą - programa veikia kaip numatyta:
+![image](https://github.com/user-attachments/assets/20976eb4-ff75-4d25-a7b7-4032c34672a8)
+
+Programos dokumentacija _(html, LaTex)_ atlikta naudojant doxygen, PDF sugeneruota naudojant Overleaf.
 ## v1.5 versija | abstrakti klasė 
 Implementuota abstrakti bazinė klasė žmogus turinti du apsaugotus atributus: vardas ir pavardė. Studentas - išvestinė žmogus klasė. Visi realizuoti metodai išpildyti v1.2 versijoje veikia ir naujoje v1.5 versijoje.
 
@@ -35,13 +70,33 @@ Strategija3.cpp:7:12: error: cannot declare variable 'asmuo' to be of abstract t
 ```
 
 ## v1.2 versija | rule of five ir įvesties/išvesties operatorių implementacija
-Realizuoti:
--    `copy konstruktorius`
--    `copy-assignment operatorius`
--    `move konstruktorius`
--    `move-assignment operatorius`
--    `įvesties operatorius` - naudojamas duomenų įvedimui ranka, jų generavimui arba skaitymui iš failo
--    `išvesties operatorius` - naudojamas duomenų išvedimui į terminalą arba failą 
+**Realizuoti:**
+- copy konstruktorius
+  
+```c++
+Stud(const Stud& studCopy)
+```
+- copy-assignment operatorius
+
+```c++
+Stud& operator=(const Stud& studCopy)
+```
+- move konstruktorius
+```c++
+Stud(Stud&& studMove)
+```
+- move-assignment operatorius
+```c++
+Stud operator=(Stud &&studMove)
+```
+- įvesties operatorius - naudojamas duomenų įvedimui ranka, jų generavimui arba skaitymui iš failo
+```c++
+friend std::ostream& operator<<(std::ostream &output, const Stud& studentas)
+```
+- išvesties operatorius - naudojamas duomenų išvedimui į terminalą arba failą
+```c++
+friend std::istream& operator>>(std::istream &input, Stud& studentas)
+```
 
 Visi operatoriai, konstruktoriai ir destruktoriai programoje atlikus testavimą veikia korektiškai:
 ![image](https://github.com/user-attachments/assets/bcb99f17-f36d-4af0-a4a5-a20bf9207964)
